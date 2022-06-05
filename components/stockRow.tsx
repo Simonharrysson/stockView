@@ -9,9 +9,10 @@ import styled from "styled-components";
 
 type RowProps = {
   stock_value: StockRowValues;
+  simple: boolean,
   handleRemoveStock: (
     event: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
-    stock: StockRowValues
+    stock: StockRowValues,
   ) => void;
 };
 
@@ -19,14 +20,14 @@ const ClickLink = styled.a`
   cursor: pointer;
 `;
 
-export const StockRow = ({ stock_value, handleRemoveStock }: RowProps) => {
+export const StockRow = ({ stock_value, handleRemoveStock, simple }: RowProps) => {
   // console.log(stock)
   // console.log("should this not be full:", stock_value);
   const dollar_change = stock_value.current_price - stock_value.close_price;
   return (
     <TableGroup>
       <TableCellDiv>
-        <SideContent align="flex-start" width={200}>
+        <SideContent align="flex-start">
           <Typography color="primary" fontWeight="regular" overflow="hidden">
             {stock_value.company_name}
           </Typography>
@@ -44,7 +45,7 @@ export const StockRow = ({ stock_value, handleRemoveStock }: RowProps) => {
           </FlexDiv>
         </SideContent>
 
-        <SideContent align="center" width={100} justify="center">
+        <SideContent align="center" justify="center">
           <Typography>
             <a
               href=""
@@ -55,13 +56,24 @@ export const StockRow = ({ stock_value, handleRemoveStock }: RowProps) => {
           </Typography>
         </SideContent>
 
+        {simple && 
+        <SideContent align="flex-start">
+          <Typography align="left">P/E Ratio</Typography>
+          <Typography align="left">{stock_value.price_to_earning}</Typography>
+        </SideContent>
+        }
+
         <SideContent align="flex-end" width={150}>
           <Typography>${stock_value.current_price}</Typography>
           <Typography color={dollar_change > 0 ? "green" : "red"}>
             ${dollar_change.toFixed(2)} (
-            {((100 * dollar_change) / stock_value.current_price).toFixed(2)}%)
+               ${Math.abs(100 * stock_value.change_percent).toFixed(2)}%
+            {/* {((100 * dollar_change) / stock_value.current_price).toFixed(2)}% */}
+            )
           </Typography>
         </SideContent>
+
+        
       </TableCellDiv>
     </TableGroup>
   );

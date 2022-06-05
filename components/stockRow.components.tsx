@@ -3,7 +3,7 @@ import styled from "styled-components";
 export const TableGroup = styled.div`
   padding: 4px 12px;
   background-color: white;
-  margin: 18px 4px;
+  margin: 9px 0px;
   height: 60px;
   border-radius: 5px;
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.025), 0 6px 20px 0 rgba(0, 0, 0, 0.05);
@@ -18,7 +18,7 @@ export const TableCellDiv = styled.div`
 
 export const SideContent = styled.div<{
   align: string;
-  width: number;
+  width?: number;
   justify?: string;
 }>`
   display: flex;

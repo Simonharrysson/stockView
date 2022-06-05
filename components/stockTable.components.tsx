@@ -34,7 +34,7 @@ export const Container = styled.div`
 export const Content = styled.div`
   border-radius: 5px;
   border: 2px white dashed;
-  padding: 4px;
+  padding: 1rem;
   max-width: 900px;
   margin: 0 auto;
   margin-top: 2rem;
@@ -43,11 +43,11 @@ export const Content = styled.div`
 
 export const FormContainer = styled.div`
   display: flex;
-  justify-content: space-evenly;
+  justify-content: space-between;
   align-items: stretch;
   flex-direction: row;
   height: 56px;
-  margin: 1rem;
+
   @media (max-width: 900px) {
     width: 100%;
     height: 300px;
