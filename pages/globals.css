@@ -1,0 +1,24 @@
+@import url("https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap");
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  font-family: "Hind Siliguri", -apple-system, BlinkMacSystemFont, Segoe UI,
+    Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue,
+    sans-serif;
+}
+
+body {
+  background-color: #0b132b;
+  /* background-color: white; */
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+* {
+  box-sizing: border-box;
+}
