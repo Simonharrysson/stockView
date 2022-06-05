@@ -16,6 +16,7 @@ import { stock } from "../models/stock";
 import axios from "axios";
 import useFetch from "react-fetch-hook";
 import wiki from "wikijs";
+import { FormControlLabel, FormGroup, Switch } from "@mui/material";
 
 export type StockRowValues = {
   ticker: string;
@@ -23,6 +24,8 @@ export type StockRowValues = {
   count: number;
   current_price: number;
   close_price: number;
+  change_percent: number;
+  price_to_earning: number;
   give: string;
 };
 
@@ -48,10 +51,12 @@ export const StockTable = () => {
   //     console.log(data);
   //   });
 
-  const [stocksValues, setStockValues] = useState<StockRowValues[]>([]);
+  const [stocksValues, setStockValues] = useState<(StockRowValues)[]>([]);
   const [fieldValues, setFieldValues] = useState(initialFieldValues);
   const [totalValue, setTotalValue] = useState(0);
   const [totalPercentageChange, setTotalPercentageChange] = useState(0);
+
+  const [simple, setSimple] = useState(false);
 
   // Sets hooks with localStorage initial data.
   useEffect(() => {
@@ -60,7 +65,6 @@ export const StockTable = () => {
       setStockValues(JSON.parse(initialValue));
     }
   }, []);
-
 
   // Adds all stockvalues to localStorage
   useEffect(
@@ -88,6 +92,7 @@ export const StockTable = () => {
 
     // Set ticker state
     const data = new FormData(event.currentTarget);
+    let creatingNew = true;
 
     const ticker = data.get("ticker") as string;
     const count = (data.get("count") as unknown) as number;
@@ -98,6 +103,27 @@ export const StockTable = () => {
       console.error("Big error here");
       return;
     }
+    
+    stocksValues.map((stock, i) => {
+
+      if (stock.ticker == ticker) {
+
+        creatingNew = false;
+        //Add the count
+        const updatedStockObj = stocksValues[i];
+        const newCount = +count + +updatedStockObj.count;
+        console.log('here are the new stocks', newCount);
+
+        updatedStockObj.count = newCount;
+
+        const updatedStockValues = stocksValues;
+        updatedStockValues[i] = updatedStockObj;
+
+        setStockValues([...updatedStockValues])
+      }
+    })
+
+    if (!creatingNew) { return }
 
     const stock_data = await stock.getRawStockData(ticker);
 
@@ -106,9 +132,12 @@ export const StockTable = () => {
       ticker: ticker,
       count: count,
       current_price: stock_data.latestPrice,
+      //Latest price is correct, previous close is not
       close_price: stock_data.previousClose,
+      change_percent: stock_data.changePercent,
       give: give,
       company_name: stock_data.companyName,
+      price_to_earning: stock_data.peRatio,
     };
 
     setStockValues([...stocksValues, stockObj]);
@@ -253,17 +282,26 @@ export const StockTable = () => {
               }
             />
             <Button name="add" variant="outlined" color="neutral" type="submit">
-              Add stock
+              Add
             </Button>
           </FormContainer>
         </form>
 
+        <FormGroup>
+          <FormControlLabel onChange={(e) => 
+            // e.preventDefault()
+            setSimple(!simple)
+          }
+          control={<Switch color="info" />} label="Simple" style={{ color: 'white' }}/>
+        </FormGroup>
+        
         {stocksValues &&
           stocksValues.map((row, i) => (
             <StockRow
               key={row.ticker}
               stock_value={row}
               handleRemoveStock={handleRemoveStock}
+              simple={simple}
             />
           ))}
       </Content>

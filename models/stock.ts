@@ -89,8 +89,10 @@ export const stock = {
       .then((response) => response.json())
       .then((data) => {
         const stockData: RawStockData = data;
-        console.log("what is this then:", stockData);
         return stockData;
+      }).catch((error) => {
+        alert('That ticker does not exist')
+        throw Error('That stock does not exist...');
       });
     //stock.formatPriceData(data)
   },
