@@ -56,7 +56,7 @@ export const StockTable = () => {
   const [totalValue, setTotalValue] = useState(0);
   const [totalPercentageChange, setTotalPercentageChange] = useState(0);
 
-  const [simple, setSimple] = useState(false);
+  const [simple, setSimple] = useState(true);
 
   // Sets hooks with localStorage initial data.
   useEffect(() => {
