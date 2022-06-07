@@ -14,6 +14,9 @@ export const TableCellDiv = styled.div`
   display: flex;
   justify-content: space-between;
   flex-direction: horizontal;
+  height: 55px;
+  align-items: center;
+}
 `;
 
 export const SideContent = styled.div<{

@@ -10,21 +10,17 @@ const Base = styled.div`
 
 const Home = () => {
   return (
-    <Base>
+    <html>
       <Head>
-        <title>Create Next App</title>
+        <title>StockView</title>
         <meta name="description" content="Simple stock viewer" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      {/* <main> */}
       <body>
         <StockTable />
       </body>
-      {/* </main> */}
-
-      <footer>{/* <h4>Footer</h4> */}</footer>
-    </Base>
+    </html>
   );
 };
 

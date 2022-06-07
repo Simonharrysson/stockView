@@ -30,33 +30,12 @@ export type StockRowValues = {
 };
 
 export const StockTable = () => {
-  // const { isLoading, error, data } = useFetch("https://www.dogsofthedow.com/dow-jones-industrial-average-companies.html");
-
-  // if (isLoading) console.log("Loading...");
-  // if (error) console.log("Error here!");
-  // const data: any = {};
-
-  // wiki()
-  //   .page("List of S&P 500 companies")
-  //   .then((page) => page.tables())
-  //   .then((tables) => {
-  //     const table = tables[0];
-  //     console.log(table);
-  //     table.map((i: any) => {
-  //       console.log(i);
-  //       const symbol: any = table[i]["symbol"].split("}}")[0];
-  //       const security = table[i]["security"];
-  //       data[symbol] = security;
-  //     });
-  //     console.log(data);
-  //   });
-
-  const [stocksValues, setStockValues] = useState<(StockRowValues)[]>([]);
+  const [stocksValues, setStockValues] = useState<StockRowValues[]>([]);
   const [fieldValues, setFieldValues] = useState(initialFieldValues);
   const [totalValue, setTotalValue] = useState(0);
   const [totalPercentageChange, setTotalPercentageChange] = useState(0);
 
-  const [simple, setSimple] = useState(true);
+  const [simple, setSimple] = useState(false);
 
   // Sets hooks with localStorage initial data.
   useEffect(() => {
@@ -66,14 +45,22 @@ export const StockTable = () => {
     }
   }, []);
 
+  useEffect(() => {
+    const initialValue = localStorage.getItem("simpleView");
+    if (initialValue) {
+      setSimple(JSON.parse(initialValue));
+    }
+  }, []);
+
   // Adds all stockvalues to localStorage
-  useEffect(
-    () => {
-      localStorage.setItem("dataObject", JSON.stringify(stocksValues));
-      console.log("Now updated:", stocksValues);
-    },
-    [stocksValues]
-  );
+  useEffect(() => {
+    localStorage.setItem("dataObject", JSON.stringify(stocksValues));
+    console.log("Now updated:", stocksValues);
+  }, [stocksValues]);
+
+  useEffect(() => {
+    localStorage.setItem("simpleView", JSON.stringify(!simple));
+  }, [simple]);
 
   const handleRemoveStock = (
     event: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
@@ -95,7 +82,7 @@ export const StockTable = () => {
     let creatingNew = true;
 
     const ticker = data.get("ticker") as string;
-    const count = (data.get("count") as unknown) as number;
+    const count = data.get("count") as unknown as number;
     const give = data.get("give") as string;
 
     if (!stocksValues) {
@@ -103,27 +90,27 @@ export const StockTable = () => {
       console.error("Big error here");
       return;
     }
-    
+
     stocksValues.map((stock, i) => {
-
       if (stock.ticker == ticker) {
-
         creatingNew = false;
         //Add the count
         const updatedStockObj = stocksValues[i];
         const newCount = +count + +updatedStockObj.count;
-        console.log('here are the new stocks', newCount);
+        console.log("here are the new stocks", newCount);
 
         updatedStockObj.count = newCount;
 
         const updatedStockValues = stocksValues;
         updatedStockValues[i] = updatedStockObj;
 
-        setStockValues([...updatedStockValues])
+        setStockValues([...updatedStockValues]);
       }
-    })
+    });
 
-    if (!creatingNew) { return }
+    if (!creatingNew) {
+      return;
+    }
 
     const stock_data = await stock.getRawStockData(ticker);
 
@@ -145,65 +132,27 @@ export const StockTable = () => {
   };
 
   // calculates the total when stocks change
-  useEffect(
-    () => {
-      const handleCalcTotValue = () => {
-        var total = 0;
-        stocksValues.map((i) => {
-          total += Number(i.count) * i.current_price;
-        });
-        return total;
-      };
-      const handleCalcTotChange = () => {
-        var change = 0;
-        stocksValues.map((i) => {
-          change += Number(i.count) * i.current_price;
-        });
-        return change;
-      };
-      const intervalId = setInterval(() => {
-        setTotalValue(handleCalcTotValue());
-        setTotalPercentageChange(handleCalcTotChange());
-        clearInterval(intervalId);
-      }, 500);
-    },
-    [stocksValues]
-  );
-
-  // const totalChange = calcTotChange();
-  const fetchRandomTicker = async () => {
-    console.log("fetching...");
-
-    axios
-      .get(
-        "https://en.wikipedia.org/w/api.php?action=parse&origin=*&format=json&page=S%26P_100&redirects"
-      )
-      .then((response) => {
-        console.log(response);
-      })
-      .catch((error) => {
-        console.log(error);
+  useEffect(() => {
+    const handleCalcTotValue = () => {
+      var total = 0;
+      stocksValues.map((i) => {
+        total += Number(i.count) * i.current_price;
       });
-    // const searchQuery = "List of S&P 500 companies";
-    const url = `https://en.wikipedia.org/w/api.php?action=parse&origin=*&format=json&page=S%26P_100&redirects`;
-
-    // "https://en.wikipedia.org/w/index.php?action=render&title=List_of_S%26P_500_companies";
-
-    try {
-      // ⛔️ TypeError: Failed to fetch
-      // 👇️ incorrect or incomplete URL
-      const response = await fetch(url, { mode: "no-cors" });
-
-      if (!response.ok) {
-        throw new Error(`Error! status: ${response.statusText}`);
-      }
-
-      const result = await response.json();
-      return result;
-    } catch (err) {
-      console.log(err);
-    }
-  };
+      return total;
+    };
+    const handleCalcTotChange = () => {
+      var change = 0;
+      stocksValues.map((i) => {
+        change += Number(i.count) * i.current_price;
+      });
+      return change;
+    };
+    const intervalId = setInterval(() => {
+      setTotalValue(handleCalcTotValue());
+      setTotalPercentageChange(handleCalcTotChange());
+      clearInterval(intervalId);
+    }, 500);
+  }, [stocksValues]);
 
   const handleRandomizeStock = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
@@ -215,29 +164,28 @@ export const StockTable = () => {
 
   return (
     //The background
-    <Container>
-      {/* Actuall content */}
-      <Content>
-        {/* <p>{JSON.stringify(data, null, 2)} </p> */}
-        <TotalContainer>
-          <ValueTotal>
-            $
-            {`${totalValue.toFixed(1)}`.split("").map((n, i) => (
-              <ReactTextTransition
-                key={i}
-                text={n}
-                className="big"
-                direction="up"
-                inline
-              />
-            ))}
-          </ValueTotal>
-          <DailyChangeTotal>Up $43 (+2,4%) from yeasterday</DailyChangeTotal>
-        </TotalContainer>
-        <br />
-        <form onSubmit={handleAddStock}>
-          <FormContainer>
-            {/* <Button
+    <main>
+      <Container>
+        <Content>
+          <TotalContainer>
+            <ValueTotal>
+              $
+              {`${totalValue.toFixed(1)}`.split("").map((n, i) => (
+                <ReactTextTransition
+                  key={i}
+                  text={n}
+                  className="big"
+                  direction="up"
+                  inline
+                />
+              ))}
+            </ValueTotal>
+            <DailyChangeTotal>Up $43 (+2,4%) from yeasterday</DailyChangeTotal>
+          </TotalContainer>
+          <br />
+          <form onSubmit={handleAddStock}>
+            <FormContainer>
+              {/* <Button
               variant="outlined"
               name="randomize"
               color="neutral"
@@ -245,67 +193,77 @@ export const StockTable = () => {
             >
               Randomize
             </Button> */}
-            <StyledTextField
-              id="ticker"
-              name="ticker"
-              label="Ticker"
-              color="primary"
-              onChange={(e) =>
-                setFieldValues({ ...fieldValues, ticker: e.target.value })
-              }
-              value={fieldValues["ticker"]}
-            />
-            <StyledTextField
-              id="count"
-              name="count"
-              type="number"
-              label="Shares"
-              color="primary"
-              onChange={(e) =>
-                setFieldValues({ ...fieldValues, count: e.target.value })
-              }
-              value={fieldValues["count"]}
-            />
-            <StyledTextField
-              id="give"
-              name="give"
-              label="Avg. Cost/share"
-              color="primary"
-              onChange={(e) =>
-                setFieldValues({ ...fieldValues, give: e.target.value })
-              }
-              // a.substring(0, position) + b + a.substring(position);
-              value={
-                // fieldValues["give"].includes("$")
-                "$" + fieldValues["give"].replace(/\D/g, "")
-                // : "$" + fieldValues["give"].replace(/\D/g, "")
-              }
-            />
-            <Button name="add" variant="outlined" color="neutral" type="submit">
-              Add
-            </Button>
-          </FormContainer>
-        </form>
+              <StyledTextField
+                id="ticker"
+                name="ticker"
+                label="Ticker"
+                color="primary"
+                onChange={(e) =>
+                  setFieldValues({ ...fieldValues, ticker: e.target.value })
+                }
+                value={fieldValues["ticker"]}
+              />
+              <StyledTextField
+                id="count"
+                name="count"
+                type="number"
+                label="Shares"
+                color="primary"
+                onChange={(e) =>
+                  setFieldValues({ ...fieldValues, count: e.target.value })
+                }
+                value={fieldValues["count"]}
+              />
+              <StyledTextField
+                id="give"
+                name="give"
+                label="Avg. Cost/share"
+                color="primary"
+                onChange={(e) =>
+                  setFieldValues({ ...fieldValues, give: e.target.value })
+                }
+                // a.substring(0, position) + b + a.substring(position);
+                value={
+                  // fieldValues["give"].includes("$")
+                  "$" + fieldValues["give"].replace(/\D/g, "")
+                  // : "$" + fieldValues["give"].replace(/\D/g, "")
+                }
+              />
+              <Button
+                name="add"
+                variant="outlined"
+                color="neutral"
+                type="submit"
+              >
+                Add
+              </Button>
+            </FormContainer>
+          </form>
 
-        <FormGroup>
-          <FormControlLabel onChange={(e) => 
-            // e.preventDefault()
-            setSimple(!simple)
-          }
-          control={<Switch color="info" />} label="Simple" style={{ color: 'white' }}/>
-        </FormGroup>
-        
-        {stocksValues &&
-          stocksValues.map((row, i) => (
-            <StockRow
-              key={row.ticker}
-              stock_value={row}
-              handleRemoveStock={handleRemoveStock}
-              simple={simple}
+          <FormGroup>
+            <FormControlLabel
+              onChange={(e) =>
+                // e.preventDefault()
+                setSimple(!simple)
+              }
+              control={<Switch color="info" />}
+              label="Simple"
+              style={{ color: "white" }}
             />
-          ))}
-      </Content>
-    </Container>
+          </FormGroup>
+
+          {stocksValues &&
+            stocksValues.map((row, i) => (
+              <StockRow
+                key={row.ticker}
+                stock_value={row}
+                handleRemoveStock={handleRemoveStock}
+                simple={simple}
+              />
+            ))}
+        </Content>
+      </Container>
+    </main>
   );
 };
 
