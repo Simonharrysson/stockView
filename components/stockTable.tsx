@@ -13,20 +13,22 @@ import {
   Content,
 } from "./stockTable.components";
 import { stock } from "../models/stock";
-import axios from "axios";
-import useFetch from "react-fetch-hook";
-import wiki from "wikijs";
+// import axios from "axios";
+// import useFetch from "react-fetch-hook";
+// import wiki from "wikijs";
 import { FormControlLabel, FormGroup, Switch } from "@mui/material";
 
 export type StockRowValues = {
   ticker: string;
   company_name: string;
-  count: number;
+  price_to_earning: number;
   current_price: number;
   close_price: number;
   change_percent: number;
-  price_to_earning: number;
-  give: string;
+
+  totCount: number;
+  avgGive: number;
+  totGive: number;
 };
 
 export const StockTable = () => {
@@ -83,7 +85,8 @@ export const StockTable = () => {
 
     const ticker = data.get("ticker") as string;
     const count = data.get("count") as unknown as number;
-    const give = data.get("give") as string;
+    const giveInput = data.get("give") as unknown as string;
+    const give = giveInput.replace("$", "") as unknown as number;
 
     if (!stocksValues) {
       // Show error
@@ -94,15 +97,17 @@ export const StockTable = () => {
     stocksValues.map((stock, i) => {
       if (stock.ticker == ticker) {
         creatingNew = false;
-        //Add the count
-        const updatedStockObj = stocksValues[i];
-        const newCount = +count + +updatedStockObj.count;
-        console.log("here are the new stocks", newCount);
 
-        updatedStockObj.count = newCount;
+        const updateSO = stock;
 
+        updateSO.totCount = +count + +updateSO.totCount;
+        updateSO.totGive = +give + +updateSO.totGive;
+
+        updateSO.avgGive = updateSO.totGive / updateSO.totCount;
+
+        //Setting the updated value to the useState
         const updatedStockValues = stocksValues;
-        updatedStockValues[i] = updatedStockObj;
+        updatedStockValues[i] = updateSO;
 
         setStockValues([...updatedStockValues]);
       }
@@ -117,12 +122,15 @@ export const StockTable = () => {
     //Calculate the change
     const stockObj: StockRowValues = {
       ticker: ticker,
-      count: count,
       current_price: stock_data.latestPrice,
       //Latest price is correct, previous close is not
       close_price: stock_data.previousClose,
       change_percent: stock_data.changePercent,
-      give: give,
+
+      totGive: give,
+      totCount: count,
+      avgGive: give / count,
+      // purchases: [[count: number, give: number]];
       company_name: stock_data.companyName,
       price_to_earning: stock_data.peRatio,
     };
@@ -136,17 +144,18 @@ export const StockTable = () => {
     const handleCalcTotValue = () => {
       var total = 0;
       stocksValues.map((i) => {
-        total += Number(i.count) * i.current_price;
+        total += Number(i.totCount) * i.current_price;
       });
       return total;
     };
     const handleCalcTotChange = () => {
       var change = 0;
       stocksValues.map((i) => {
-        change += Number(i.count) * i.current_price;
+        change += Number(i.totCount) * i.current_price;
       });
       return change;
     };
+
     const intervalId = setInterval(() => {
       setTotalValue(handleCalcTotValue());
       setTotalPercentageChange(handleCalcTotChange());
@@ -279,4 +288,4 @@ export const StockTable = () => {
 //  6. Css breaking issue
 //  7. Explore/add google ads
 //  8. Edit stock list
-//  9. On/off switch "simple view" --> Displays markets prices
+//  9. On/off switch "simple view" --> Displays markets prices √

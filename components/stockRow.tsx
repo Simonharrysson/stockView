@@ -40,12 +40,13 @@ export const StockRow = ({
             {stock_value.company_name}
           </RowTitle>
 
-          <FlexDiv width={150}>
+          <FlexDiv>
             {/* <ClickLink onClick={() => console.log("Add")}>
               <AddOutlinedIcon htmlColor="RGB(0, 255, 0)" />
             </ClickLink> */}
             <RowTitle color="secondary" fontWeight="bold">
-              {stock_value.count} {stock_value.count > 1 ? "STOCKS" : "STOCK"}
+              {stock_value.totCount}{" "}
+              {stock_value.totCount > 1 ? "STOCKS" : "STOCK"}
             </RowTitle>
             {/* <ClickLink onClick={() => console.log("Remove")}>
               <RemoveOutlinedIcon htmlColor="red" />
@@ -54,7 +55,7 @@ export const StockRow = ({
         </SideContent>
 
         <SideContent align="center" justify="center">
-          <RowTitle>
+          <RowTitle color={"red"}>
             <a
               href=""
               onClick={(event) => handleRemoveStock(event, stock_value)}
@@ -73,10 +74,21 @@ export const StockRow = ({
 
         <SideContent align="flex-start">
           <RowTitle align="left">Avg. Cost/share</RowTitle>
-          <RowTitle align="left">{stock_value.give}</RowTitle>
+          <RowTitle align="left">${stock_value.avgGive.toFixed(1)}</RowTitle>
         </SideContent>
 
-        <SideContent align="flex-end" width={150}>
+        <SideContent align="flex-start">
+          <RowTitle align="left">All time change</RowTitle>
+          <RowTitle align="left">
+            {(
+              100 *
+              (stock_value.current_price / stock_value.totGive - 1)
+            ).toFixed(1)}
+            %
+          </RowTitle>
+        </SideContent>
+
+        <SideContent align="flex-end">
           <RowTitle>${stock_value.current_price}</RowTitle>
           <RowTitle color={dollar_change > 0 ? "green" : "red"}>
             ${dollar_change.toFixed(2)} ( $

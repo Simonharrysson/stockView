@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-export const FlexDiv = styled.div<{ width: number }>`
+export const FlexDiv = styled.div<{ width?: number }>`
   display: flex;
   justify-content: space-between;
   width: ${(props) => props.width}px;
