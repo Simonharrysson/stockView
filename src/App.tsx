@@ -1,25 +1,36 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import './style.css';
+import { StockTable } from './components/StockTable';
+import { ThemeProvider } from '@mui/material/styles';
+import { createTheme } from '@mui/material/styles';
+import { red } from '@mui/material/colors';
+
+const theme = createTheme({
+  palette: {
+      primary: {
+          main: '#ebf5f5',
+          light: '#ffffff',
+          dark: '#000000',
+      },
+      secondary: {
+          main: '#598588',
+      },
+      
+      error: {
+          main: red.A400,
+      },
+  },
+});
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <ThemeProvider theme={theme}>
+      <div className="App">
+        {/* <div className="tw-flex"> */}
+          <StockTable />
+          {/* <p>News</p> */}
+        {/* </div> */}
+      </div>
+    </ThemeProvider>
   );
 }
 
