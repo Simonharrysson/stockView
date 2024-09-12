@@ -4,6 +4,7 @@ import Button from "@mui/material/Button";
 import ReactTextTransition from "react-text-transition";
 import { fetchCurrentPriceAndChange, QuoteResponse } from "../stock";
 import {TextField } from "@mui/material";
+import { SwitchTextTrack } from "../mui-treasury/switch-text-track";
 
 export const StockTable = () => {
 
@@ -97,10 +98,10 @@ export const StockTable = () => {
     className?: string
   }
 
-  const FlexComponent: React.FC<MyComponentProps> = ({ width = 0, align = 'flex-start', justify = 'flex-start', className, children }) => {
+  const FlexComponent: React.FC<MyComponentProps> = ({ width = "50", align = 'flex-start', justify = 'flex-start', className = "", children }) => {
     return (
       <div
-        className={`tw-flex tw-flex-col tw-h-[25px] ${className}  tw-${align} tw-${justify} tw-w-[${width}]`}
+        className={`tw-flex tw-flex-col tw-h-[25px] ${className}  tw-${align} tw-${justify} tw-w-${width}`}
       >
         {children}
       </div>
@@ -185,8 +186,8 @@ export const StockTable = () => {
         </FormGroup> */}
 
 {stocksValues.length > 0 && 
-  <div className="tw-px-3 tw-py-1 tw-my-2  tw-text-foreground tw-font-bold">    
-      <div className="tw-flex tw-w-[80%] tw-justify-between tw-items-center">
+  <div className="tw-px-3 tw-py-1 tw-my-2  tw-text-foreground tw-font-bold tw-flex tw-justify-between">    
+      <div className="tw-flex tw-gap-20 tw-items-center">
 
         <FlexComponent>
           <p className="tw-m-0">
